@@ -5,12 +5,15 @@ from pathlib import Path
 from string import Template
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import random
 
 # Load env vars
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
 MY_ADDRESS = os.getenv("MY_ADDRESS")
 PASSWORD = os.getenv("PASSWORD")
+HOST= os.getenv("HOST")
+PORT=os.getenv("PORT")
 
 def get_contacts(filename):
     """
@@ -26,6 +29,30 @@ def get_contacts(filename):
             emails.append(a_contact.split()[1])
     return names, emails
 
+def get_names(filename):
+    """
+    Return one list: names containing names
+    read from a file specified by filename.
+    """
+
+    names = []
+    with open(filename, mode='r', encoding='utf-8') as contacts_file:
+        for a_contact in contacts_file:
+            names.append(a_contact.split()[0])
+    return names
+
+def get_matches(names):
+    """
+    Return a dict of matches from a list of names.
+    """
+    names_copy = names.copy()
+    random.shuffle(names_copy)
+    matches = [names_copy[i-1] for i in range(len(names_copy))]
+    matches_dict = {}
+    for i in range(len(names_copy)):
+        matches_dict[names_copy[i]] = matches[i]
+    return matches_dict
+
 def read_template(filename):
     """
     Returns a Template object comprising the contents of the
@@ -37,20 +64,22 @@ def read_template(filename):
     return Template(template_file_content)
 
 def main():
-    names, emails = get_contacts('mycontacts.txt') # read contacts
-    message_template = read_template('message.txt')
+    names, emails = get_contacts('docs/contacts.txt') # read contacts
+    matches = get_matches(names)
+    message_template = read_template('docs/message.txt')
 
     # set up the SMTP server
-    s = smtplib.SMTP(host='your_host_address_here', port=your_port_here)
+    s = smtplib.SMTP(HOST, PORT)
     s.starttls()
     s.login(MY_ADDRESS, PASSWORD)
 
     # For each contact, send the email:
     for name, email in zip(names, emails):
         msg = MIMEMultipart()       # create a message
+        gives_to = matches[name] # Find out match
 
         # add in the actual person name to the message template
-        message = message_template.substitute(PERSON_NAME=name.title())
+        message = message_template.substitute(PERSON_NAME=name.title(), GIVES_TO=gives_to.title())
 
         # Prints out the message body for our sake
         print(message)
@@ -58,10 +87,10 @@ def main():
         # setup the parameters of the message
         msg['From']=MY_ADDRESS
         msg['To']=email
-        msg['Subject']="This is TEST"
+        msg['Subject']="Intercambio Primárquez! 🎅"
 
         # add in the message body
-        msg.attach(MIMEText(message, 'plain'))
+        msg.attach(MIMEText(message, 'html'))
 
         # send the message via the server set up earlier.
         s.send_message(msg)
