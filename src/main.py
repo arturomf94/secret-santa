@@ -1,12 +1,16 @@
 import smtplib
-
+import os
+from dotenv import load_dotenv
+from pathlib import Path
 from string import Template
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-MY_ADDRESS = 'my_address@example.comm'
-PASSWORD = 'mypassword'
+# Load env vars
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
+MY_ADDRESS = os.getenv("MY_ADDRESS")
+PASSWORD = os.getenv("PASSWORD")
 
 def get_contacts(filename):
     """
