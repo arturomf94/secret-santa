@@ -29,18 +29,6 @@ def get_contacts(filename):
             emails.append(a_contact.split()[1])
     return names, emails
 
-def get_names(filename):
-    """
-    Return one list: names containing names
-    read from a file specified by filename.
-    """
-
-    names = []
-    with open(filename, mode='r', encoding='utf-8') as contacts_file:
-        for a_contact in contacts_file:
-            names.append(a_contact.split()[0])
-    return names
-
 def get_matches(names):
     """
     Return a dict of matches from a list of names.
@@ -87,7 +75,7 @@ def main():
         # setup the parameters of the message
         msg['From']=MY_ADDRESS
         msg['To']=email
-        msg['Subject']="Intercambio Primárquez! 🎅"
+        msg['Subject']="Secret 🎅"
 
         # add in the message body
         msg.attach(MIMEText(message, 'html'))
