@@ -69,9 +69,6 @@ def main():
         # add in the actual person name to the message template
         message = message_template.substitute(PERSON_NAME=name.title(), GIVES_TO=gives_to.title())
 
-        # Prints out the message body for our sake
-        print(message)
-
         # setup the parameters of the message
         msg['From']=MY_ADDRESS
         msg['To']=email
